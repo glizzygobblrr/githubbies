@@ -27,10 +27,9 @@ const Login = () => {
             }
 
             const data = await response.json();
-            // Handle successful login
             console.log('Login successful', data);
             localStorage.setItem('token', data.token);
-            // Optionally, redirect user or update state here based on the role
+
         } catch (err) {
             console.error('Login failed', err);
             setError(err.message);
