@@ -3,7 +3,7 @@ import '../styles/login.css';
 import logo from '../assets/logo.png';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(''); // Changed to email
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -14,22 +14,22 @@ const Login = () => {
         setError('');
 
         try {
-            const response = await fetch('/api/login', { // Use relative URL due to proxy
+            const response = await fetch('/login', { // Update to the correct endpoint
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Invalid email or password');
-            }
+                body: JSON.stringify({ email, password }), // Ensure you're sending email here
+            });            
 
             const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Invalid email or password');
+            }
+
             console.log('Login successful', data);
             localStorage.setItem('token', data.token);
-
         } catch (err) {
             console.error('Login failed', err);
             setError(err.message);
@@ -47,10 +47,10 @@ const Login = () => {
                 <h2>Login</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="email">Email</label>
+                        <label htmlFor="email">Email</label> {/* Updated label to email */}
                         <input
-                            type="email"
-                            id="email"
+                            type="email" // Change input type to email for validation
+                            id="email" // Updated id to email
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
