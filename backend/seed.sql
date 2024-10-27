@@ -1,3 +1,5 @@
+CREATE DATABASE githubbies;
+
 CREATE TABLE roles (
     roleID VARCHAR(30) PRIMARY KEY,
     roleType CHAR(20) NOT NULL,
