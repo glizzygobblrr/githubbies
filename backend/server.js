@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// app.post('/login', authController.loginUser);
+app.post('/login', authController.loginUser);
 
 // signup user 
 
