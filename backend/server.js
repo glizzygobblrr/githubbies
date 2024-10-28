@@ -11,7 +11,11 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.post('/login', authController.loginUser);
+// app.post('/login', authController.loginUser);
+
+// signup user 
+
+app.post('/signup',authController.registerUser);
 
 const PORT = process.env.PORT || 5000;
 

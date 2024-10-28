@@ -5,7 +5,7 @@ class Account{
     constructor(accID,name,contactNo,password,email) {
         this.accID = accID;
         this.name = name;
-        this.contactNO = contactNo;
+        this.contactNo = contactNo;
         this.password = password;
         this.email = email;
     }
@@ -13,7 +13,7 @@ class Account{
     // MEthods for  creating user and retrieving user
 
     static async getAccountByEmail(email){
-        const connection = await sql.connect();
+        const connection = await sql.connect(dbConfig);
         const sqlQuery = `SELECT * FROM Account WHERE email = @email`
         const request = connection.request();
         request.input("email",email);
@@ -37,15 +37,19 @@ class Account{
         }
     }
 
-    static async registerAccount (accID,name,email,contactNo,password,email){
-        const connection = await sql.connect();
-        const sqlQuery = `INSERT INTO Account VALUES (@accID,@name,@email,@contactNo,@password,@email)`;
+    static async registerAccount (account){
+        const connection = await sql.connect(dbConfig);
+        const sqlQuery = `INSERT INTO Account VALUES (@accID,@name,@contactNo,@password,@email)`;
         const request = connection.request();
-        request.input(accID,name,email,contactNo,password,email);
+        request.input("accID",account.accID);
+        request.input("name",account.name);
+        request.input("contactNo",account.contactNo);
+        request.input("password",sql.VarChar,account.password);
+        request.input("email",sql.VarChar,account.email);
         const result = await request.query(sqlQuery);
         return result.rowsAffected;
-    }s
+    }
     
 }
 
-module.exports = { getAccountEmail, registerAccount }; // Ensure you're exporting as an object
+module.exports =  Account; // you're exporting as an object
