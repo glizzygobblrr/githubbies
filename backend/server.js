@@ -13,6 +13,10 @@ app.use(bodyParser.json());
 
 app.post('/login', authController.loginUser);
 
+// signup user 
+
+app.post('/signup',authController.registerUser);
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, async () => {
