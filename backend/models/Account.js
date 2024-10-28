@@ -47,7 +47,22 @@ class Account{
         const result = await request.query(sqlQuery);
         return result.rowsAffected;
     }
-    
+
+    // Extract the role from the Account to store in JWT payload
+    static async retrieveRoleFromAccID(accID){
+        const connection = await sql.connect(dbConfig);
+        const sqlQuery = `SELECT roleType FROM Role WHERE Role.accID = @accID`
+        const request = connection.request();
+        request.input("accID",accID);
+        const result = await request.query(sqlQuery);
+        if (result.recordset > 0){
+            const roleType = result.recordset[0].roleType;
+            return roleType;
+        }
+        else{
+            return null;
+        }
+    } 
 }
 
 module.exports =  Account; // you're exporting as an object
