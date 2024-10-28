@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import '../styles/login.css'; 
 import logo from '../assets/logo.png';
-
 const Login = () => {
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzAxMDU4NzYsImV4cCI6MTczMDEwNjA3Nn0.vSNTKCXwdH_e8EYRqRHwRRnvOpE4UXu6xjEkYDCEZRI"
     const [email, setEmail] = useState(''); // Changed to email
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -13,11 +13,14 @@ const Login = () => {
         setLoading(true);
         setError('');
 
+        console.log(token);
+
         try {
             const response = await fetch('/login', { // Update to the correct endpoint
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`               
                 },
                 body: JSON.stringify({ email, password }), // Ensure you're sending email here
             });            

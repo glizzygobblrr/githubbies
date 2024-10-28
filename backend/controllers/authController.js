@@ -7,8 +7,9 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
         const account = await Account.getAccountByEmail(email);
+        console.log(account.password);
         console.log("Success");
-        if (!user) {
+        if (!account) {
             console.log('Account not found:', email);
             return res.status(401).json({ message: 'Invalid credentials' }); // Make sure to return JSON
         }
@@ -17,7 +18,7 @@ const loginUser = async (req, res) => {
             console.log('Password does not match for the account:', email);
             return res.status(401).json({ message: 'Invalid credentials' }); // Make sure to return JSON
         }
-        console.log('User logged in successfully:', email);
+        console.log('Account logged in successfully:', email);
         res.status(200).json({ token });
     } catch (err) {
         console.error('Error during login:', err);
@@ -27,7 +28,6 @@ const loginUser = async (req, res) => {
 
 const registerUser = async (req, res) => { 
     const { accID, name, contactNo, password, email } = req.body;
-    console.log(contactNo);
     try { 
         const existingAccount = await Account.getAccountByEmail(email); 
         if (existingAccount) { 

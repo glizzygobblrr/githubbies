@@ -4,7 +4,7 @@ CREATE TABLE Account (
     accID VARCHAR(30) NOT NULL,
   name VARCHAR(30) NOT NULL,
     contactNo VARCHAR(10) NOT NULL,
-    password VARCHAR(50) NOT NULL,
+    password VARCHAR(100) NOT NULL,
     email VARCHAR(50) NOT NULL,
     CONSTRAINT PK_Account PRIMARY KEY (accID)
 

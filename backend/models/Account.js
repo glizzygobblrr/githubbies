@@ -20,16 +20,14 @@ class Account{
         const result = await request.query(sqlQuery);
         if (result.recordset.length > 0){
             // Return the user , a user 
-            return result.recordset[0].map(
-                (row) => new Account
-                    (
-                        row.accID,
-                        row.name,
-                        row.contactNo,
-                        row.password,
-                        row.email,
-                    )
-            )
+            const row = result.recordset[0];
+            return new Account(
+                row.accID,
+                row.name,
+                row.contactNo,
+                row.password,
+                row.email
+            );
         }
         
         else {
