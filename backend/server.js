@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.post('/login', authController.loginUser);
 
 // signup user 
+app.get('/retrieveRole/:accID',authController.retrieveRole)
 
 app.post('/signup',authController.registerUser);
 
@@ -37,3 +38,4 @@ process.on("SIGINT", async () => {
     console.log("Database connection closed");
     process.exit(0);
 });
+
