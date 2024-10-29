@@ -19,11 +19,33 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' }); // Make sure to return JSON
         }
         // retrieve role here 
-        // const role = await Account.retrieveRoleFromAccID(account.accID);
-        console.log('Account logged in successfully:', email);
-        const payload = {"accID": account.accID, "accName": account.accName};
-        const token = jwt.sign(payload, "your_secret_key", { expiresIn: "3600s" }); // Expires in 1h
-        res.status(200).json({ token });
+        const role = await Account.retrieveRoleFromAccID(account.accID);
+        if(role != null){
+            let message = " ";
+            switch (role){
+                case "Admin":
+                    // Send the payload 
+                    message = "This is the administrator role";
+                    break;
+                case "Operator":
+                    message = "This is the operator role";
+                case "Content Creator":
+                    message = "This is the content creator role";
+                
+                case "Analyst":
+                    message = "This is the analyst role"
+                default:
+                    message = "Role Invalid";
+            }
+            const payload = {"accID":account.accID,"roleType":role,"confirmation":message}
+            const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: "36000s"})
+            
+            return res.status(200).json({token})
+        }
+        else {
+            res.status(401).send("Unauthorized User");
+        }
+        
     } catch (err) {
         console.error('Error during login:', err);
         res.status(500).json({ message: 'Internal server error' }); // Make sure to return JSON
