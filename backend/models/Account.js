@@ -53,9 +53,10 @@ class Account{
         const connection = await sql.connect(dbConfig);
         const sqlQuery = `SELECT roleType FROM Role WHERE Role.accID = @accID`
         const request = connection.request();
-        request.input("accID",accID);
+        request.input("accID",sql.VarChar,accID);
         const result = await request.query(sqlQuery);
-        if (result.recordset > 0){
+        console.log(result);
+        if (result.recordset.length > 0){
             const roleType = result.recordset[0].roleType;
             return roleType;
         }

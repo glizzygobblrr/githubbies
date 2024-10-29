@@ -52,8 +52,7 @@ const registerUser = async (req, res) => {
 // Testing role retrieval 
 const retrieveRole = async (req,res) =>{
     try {
-        const accID = req.params 
-        console.log(accID);
+        const accID = req.params.accID;
         const roleType = await Account.retrieveRoleFromAccID(accID);
         res.status(200).json({"roleType":roleType});
     }
