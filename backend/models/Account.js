@@ -13,11 +13,13 @@ class Account{
     // MEthods for  creating user and retrieving user
 
     static async getAccountByEmail(email){
+        console.log('Fetching account for email:', email); 
         const connection = await sql.connect(dbConfig);
         const sqlQuery = `SELECT * FROM Account WHERE email = @email`
         const request = connection.request();
-        request.input("email",email);
+        request.input("email",email.trim());
         const result = await request.query(sqlQuery);
+        console.log('Query result:', result);
         if (result.recordset.length > 0){
             // Return the user , a user 
             const row = result.recordset[0];

@@ -13,40 +13,45 @@ const loginUser = async (req, res) => {
             console.log('Account not found:', email);
             return res.status(401).json({ message: 'Invalid credentials' }); // Make sure to return JSON
         }
+
+        console.log('Attempting to compare password:', password);
         const isMatch = await bcrypt.compare(password, account.password);
+        console.log('Password match result:', isMatch);
+
         if (!isMatch) {
             console.log('Password does not match for the account:', email);
             return res.status(401).json({ message: 'Invalid credentials' }); // Make sure to return JSON
         }
         // retrieve role here 
-        const role = await Account.retrieveRoleFromAccID(account.accID);
-        if(role != null){
-            let message = " ";
-            switch (role){
-                case "Admin":
-                    // Send the payload 
-                    message = "This is the administrator role";
-                    break;
-                case "Operator":
-                    message = "This is the operator role";
-                case "Content Creator":
-                    message = "This is the content creator role";
-                
-                case "Analyst":
-                    message = "This is the analyst role"
-                default:
-                    message = "Role Invalid";
-            }
-            const payload = {"accID":account.accID,"roleType":role,"confirmation":message}
-            const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: "36000s"})
-            
-            return res.status(200).json({token})
+        const rolePrefix = account.accID.substring(0, 3); // get the first 3 char of accID
+        let role;
+
+        switch (rolePrefix) {
+            case "ADM":
+                role = "Admin";
+                break;
+            case "OPT":
+                role = "Operator";
+                break;
+            case "CCR": 
+                role = "Content Creator";
+                break;
+            case "ANL":
+                role = "Analyst";
+                break;
+            default:
+                role = null; // Invalid role
+                break;
         }
-        else {
-            res.status(401).send("Unauthorized User");
-        }
+        let message = `This is the ${role.toLowerCase()} role`;
         
-    } catch (err) {
+        const payload = { "accID": account.accID, "roleType": role, "confirmation": message };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "36000s" });
+        console.log('Response:', { token }, {role});
+        return res.status(200).json({ token,role });
+        
+        
+    } catch (err) {        
         console.error('Error during login:', err);
         res.status(500).json({ message: 'Internal server error' }); // Make sure to return JSON
     }

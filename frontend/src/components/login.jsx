@@ -28,11 +28,28 @@ const Login = () => {
             const data = await response.json();
 
             if (!response.ok) {
+                console.error('Response Data:', data);
                 throw new Error(data.message || 'Invalid email or password');
             }
 
             console.log('Login successful', data);
             localStorage.setItem('token', data.token);
+
+            const roleType = localStorage.getItem(data.roleType);
+            // check role and redirect based on the account's role
+            if (data.role === "Admin") {
+                window.open('/admin', '_blank'); 
+            } else if (data.role === "Operator") {
+                window.open('/operator', '_blank'); 
+            } else if (data.role === "Content Creator") {
+                window.location.href = '/content-creator';
+            } else if (data.role === "Analyst") {
+                window.location.href = '/analyst';
+            } else {
+                console.error('Invalid role');
+                setError('Invalid role');
+            }
+        
         } catch (err) {
             console.error('Login failed', err);
             setError(err.message);
