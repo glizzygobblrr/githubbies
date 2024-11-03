@@ -1,4 +1,4 @@
-CREATE DATABASE githubbies;
+CREATE DATABASE fsdpRDS;
 
 CREATE TABLE Account (
     accID VARCHAR(30) NOT NULL,
