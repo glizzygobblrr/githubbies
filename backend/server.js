@@ -3,20 +3,26 @@ const sql = require('mssql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const authController = require('./controllers/authController');
+const fileController = require('./controllers/fileController');
 const dbConfig = require('./dbConfig');
+const awsConfig = require('./awsConfig');
 
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' })); //handle the file-size limit
 
+//accounts
 app.post('/login', authController.loginUser);
-
-// signup user 
 app.get('/retrieveRole/:accID',authController.retrieveRole)
-
 app.post('/signup',authController.registerUser);
+
+//s3
+app.post('/upload', fileController.uploadFile);
+app.delete('/delete', fileController.deleteFile);
+app.get('/list-files', fileController.listFiles);
+app.get('/file-url/:key', fileController.getFileUrl);
 
 const PORT = process.env.PORT || 5000;
 
