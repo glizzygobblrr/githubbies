@@ -41,3 +41,23 @@
     -->
   </body>
 </html>
+
+<script type="module">
+  import { generateCodeVerifier, generateCodeChallenge, storeCodeVerifier } from './src/auth/pkce.js';
+
+  async function startOAuthFlow() {
+      const codeVerifier = generateCodeVerifier();
+      storeCodeVerifier(codeVerifier);
+      
+      const codeChallenge = await generateCodeChallenge(codeVerifier);
+  
+      const clientId = 'YOUR_CLIENT_ID'; // Replace with your Canva client ID
+      const redirectUri = 'YOUR_REDIRECT_URI'; // Replace with your redirect URI
+
+      // Redirect the user to Canva's OAuth authorization endpoint
+      window.location.href = `http://localhost:5000/auth/canva?codeVerifier=${codeVerifier}&codeChallenge=${codeChallenge}`;
+  }
+</script>
+
+<!-- Button to start the OAuth flow -->
+<button onclick="startOAuthFlow()">Log in with Canva</button>
