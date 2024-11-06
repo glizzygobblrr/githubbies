@@ -14,8 +14,9 @@ const Admin = () => {
             <div className="admin-section">
                 <h2>Campaign Control</h2>
                 <p>Set up and control ad campaigns, including scheduling and content selection.</p>
-                <button onClick={() => console.log('Navigating to Campaign Control')}>Manage Campaigns</button>
+                <button onClick={() => (window.location.href = "./campaign")}>Manage Campaigns</button>
             </div>
+
             
             <div className="admin-section">
                 <h2>Reports and Analytics</h2>

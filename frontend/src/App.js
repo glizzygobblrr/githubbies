@@ -1,17 +1,19 @@
-import React from 'react';
+// src/App.js
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/login';
-import Admin from './components/admin';  // Ensure this is correct
+import Admin from './components/admin';
 import Operator from './components/operator';
+import Campaign from './components/campaign';
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Admin />} />  {/* Admin route */}
+        <Route path="/admin" element={<Admin />} />
         <Route path="/operator" element={<Operator />} />
-        <Route path="*" element={<Login />} /> {/* Default route to login */}
+        <Route path="/campaign" element={<Campaign />} />
+        <Route path="*" element={<Login />} />
       </Routes>
     </Router>
   );
