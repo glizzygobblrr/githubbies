@@ -79,7 +79,6 @@ CREATE TABLE TvGroup (
     groupName VARCHAR(30) NOT NULL,
     operatorID VARCHAR(30) NULL,
     adminID VARCHAR(30) NULL,
-    category VARCHAR(100) NOT NULL,
     tvID VARCHAR(30) NULL,  -- tvID is made nullable to allow for no association initially
 
     CONSTRAINT PK_TvGroup PRIMARY KEY (tvGroupID),
@@ -96,6 +95,18 @@ CREATE TABLE TvGroup (
         FOREIGN KEY (adminID)
         REFERENCES Admin(adminID) ON DELETE NO ACTION
 );
+
+
+CREATE TABLE TvGroupCategory (
+	tvGroupID VARCHAR(30) NOT NULL,
+	categoryType VARCHAR(30) NOT NULL,
+	categoryValue VARCHAR(100) NULL,
+	
+	CONSTRAINT PK_TvGroupCategory PRIMARY KEY (tvGroupID,categoryType),
+	CONSTRAINT FK_TvGroupCategory_TvGroup 
+		FOREIGN KEY (tvGroupID)
+		REFERENCES TvGroup(tvGroupID) ON DELETE NO ACTION
+)
 
 CREATE TABLE Campaign (
     campaignID VARCHAR(30) NOT NULL,
@@ -200,9 +211,13 @@ INSERT INTO TV (tvID, tvLocation, tvSize, tvGroupID, status) VALUES
 ('tv001', 'Front Door', 55, NULL, 'active'),
 ('tv002', 'Behind Counter', 55, NULL, 'inactive');
 
-INSERT INTO TvGroup (tvGroupID, groupName, operatorID, AdminID, category, tvID) VALUES
-('tvgrp001', 'CBD Area', 'OPT001', 'ADM001', 'Location', 'tv001'),
-('tvgrp002', 'Student Specials', 'OPT001', 'ADM001', 'Demographics', 'tv002');
+INSERT INTO TvGroup (tvGroupID, groupName, operatorID, AdminID,tvID) VALUES
+('tvgrp001', 'CBD Area', 'OPT001', 'ADM001', 'tv001'),
+('tvgrp002', 'Student Specials', 'OPT001', 'ADM001', 'tv002');
+
+INSERT INTO TvGroupCategory (tvGroupID, categoryType, categoryValue) VALUES
+('tvgrp001', 'Location', '1 Raffles Pl, Singapore 048616'),
+('tvgrp002', 'Demographics', 'Student');
 
 -- Insert into Campaign
 INSERT INTO Campaign (campaignID, campaignName, startDateTime, endDateTime, operatorID, AdminID) VALUES

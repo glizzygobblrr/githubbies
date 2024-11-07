@@ -1,0 +1,1 @@
+// Middleware function for validating user's role (sits between the route and another things)

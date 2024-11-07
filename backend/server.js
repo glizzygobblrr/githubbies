@@ -1,4 +1,6 @@
 const express = require('express');
+const session = require('express-session');
+const cookieParser = require("cookie-parser");
 const sql = require('mssql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -6,12 +8,25 @@ const authController = require('./controllers/authController');
 const fileController = require('./controllers/fileController');
 const dbConfig = require('./dbConfig');
 const awsConfig = require('./awsConfig');
-
-require('dotenv').config();
-
+const canvaAuth = require('./canvaAuth');
 const app = express();
+require('dotenv').config();
+app.use(cookieParser());
+
+app.use(session({
+    secret: "anyrandomstring",
+    resave: false,
+    saveUninitialized: true, 
+    cookie: { secure: false, httpOnly: true, maxAge: 60000 }  
+}));
+
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' })); //handle the file-size limit
+
+// OAuth - Canva authentication
+app.get('/oauth/canva', canvaAuth.initiateAuth);
+app.get('/oauth/redirect', canvaAuth.callback);
+
 
 //accounts
 app.post('/login', authController.loginUser);
