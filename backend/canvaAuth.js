@@ -24,8 +24,6 @@ const initiateAuth = (req, res, next) => {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = generateCodeChallenge(codeVerifier);
 
-    res.cookie('code_verifier', codeVerifier, { httpOnly: true, secure: false, maxAge: 3600000 });  // maxAge: 1 hour
-
     // Set the cookie for code_verifier
     res.cookie('code_verifier', codeVerifier, { httpOnly: true });
 
