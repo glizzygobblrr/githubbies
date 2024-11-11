@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas, Rect, Circle, IText, FabricImage } from 'fabric';
 import { useNavigate } from 'react-router-dom';
 import './templateEditor.css';
-import { FaImage, FaSquare, FaCircle, FaFont, FaSave } from 'react-icons/fa'; // Import icons for example
+import { FaImage, FaVideo, FaSquare, FaCircle, FaFont, FaSave } from 'react-icons/fa';
 
 const TemplateEditor = () => {
   const canvasRef = useRef(null);
@@ -10,6 +10,8 @@ const TemplateEditor = () => {
   const navigate = useNavigate();
   const [selectedObject, setSelectedObject] = useState(null); 
   const [showTools, setShowTools] = useState(false); 
+  const [width, setWidth] = useState(0); 
+  const [height, setHeight] = useState(0); 
 
   // Initialize Fabric.js Canvas
   useEffect(() => {
@@ -21,6 +23,12 @@ const TemplateEditor = () => {
       canvas.current.on('object:selected', (e) => {
         setSelectedObject(e.target); 
         setShowTools(true); 
+
+        // Set initial width and height for the selected object
+        if (e.target) {
+          setWidth(e.target.width || 0);
+          setHeight(e.target.height || 0);
+        }
       });
 
       canvas.current.on('selection:cleared', () => {
@@ -48,6 +56,7 @@ const TemplateEditor = () => {
       lockScalingFlip: true,
     });
     canvas.current.add(rect);
+    console.log('Rectangle added');
   };
 
   // Add a Circle
@@ -109,49 +118,159 @@ const TemplateEditor = () => {
     }
   };
 
-  // Handle the save template functionality
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+  
+      reader.onload = (readerEvent) => {
+        const video = document.createElement('video');
+        video.src = readerEvent.target.result;
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+  
+        video.addEventListener('loadeddata', () => {
+          console.log('Video loaded successfully');
+  
+          const aspectRatio = video.videoWidth / video.videoHeight;
+  
+          const canvasWidth = canvas.current.width;
+          const canvasHeight = canvas.current.height;
+  
+          let videoWidth = canvasWidth * 0.5; 
+          let videoHeight = videoWidth / aspectRatio;  
+  
+          if (videoHeight > canvasHeight * 0.5) {
+            videoHeight = canvasHeight * 0.5;
+            videoWidth = videoHeight * aspectRatio;
+          }
+
+          const fabricVideo = new FabricImage(video, {
+            left: (canvasWidth - videoWidth) / 2,  
+            top: (canvasHeight - videoHeight) / 2, 
+            width: videoWidth,
+            height: videoHeight,
+            objectCaching: false,  
+            hasControls: true,    
+            selectable: true,    
+          });
+  
+          canvas.current.add(fabricVideo);
+  
+          video.play();
+  
+          const renderVideoFrame = () => {
+            if (fabricVideo) {
+              fabricVideo.set({ width: videoWidth, height: videoHeight });
+              fabricVideo.setCoords();
+              canvas.current.renderAll(); 
+  
+              requestAnimationFrame(renderVideoFrame);
+            }
+          };
+  
+           renderVideoFrame();
+  
+           fabricVideo.on('moving', function () {
+             video.style.left = fabricVideo.left + 'px';
+            video.style.top = fabricVideo.top + 'px';
+          });
+  
+           fabricVideo.on('scaling', function () {
+            const { width, height } = fabricVideo;
+            video.width = width;   
+            video.height = height;  
+          });
+          
+           fabricVideo.render = function (ctx) {
+            ctx.clearRect(0, 0, fabricVideo.width, fabricVideo.height);  
+            ctx.drawImage(video, 0, 0, fabricVideo.width, fabricVideo.height); 
+          };
+  
+          fabricVideo.setCoords();
+          canvas.current.renderAll();
+        });
+  
+         video.onerror = (err) => {
+          console.error('Error loading video:', err);
+        };
+        
+      };
+  
+      reader.onerror = (err) => {
+        console.error('Error reading video file:', err);
+      };
+  
+      reader.readAsDataURL(file);
+    } else {
+      console.error('No file selected or file is invalid.');
+    }
+  };
+  
+  // save template functionality
   const handleSaveTemplate = () => {
     const templateData = canvas.current.toJSON();
     console.log('Template Data:', templateData); 
   };
 
-  // Back to Admin button
+  // back to Admin button
   const handleBackToAdmin = () => {
     navigate('/admin');
   };
 
-  // Define the functions for changing properties
-  const changeTextFont = (font) => {
-    if (selectedObject && selectedObject.set) {
-      selectedObject.set({ fontFamily: font });
+  // Change Width
+  const changeWidth = (newWidth) => {
+    if (selectedObject) {
+      selectedObject.set({ width: newWidth });
+      setWidth(newWidth);
       canvas.current.renderAll();
     }
   };
 
-  const changeTextColor = (color) => {
-    if (selectedObject && selectedObject.set) {
-      selectedObject.set({ fill: color });
+  // Change Height
+  const changeHeight = (newHeight) => {
+    if (selectedObject) {
+      selectedObject.set({ height: newHeight });
+      setHeight(newHeight);
       canvas.current.renderAll();
     }
   };
 
-  const changeTextSize = (size) => {
-    if (selectedObject && selectedObject.set) {
-      selectedObject.set({ fontSize: size });
-      canvas.current.renderAll();
-    }
-  };
-
+  // Change shape color
   const changeShapeColor = (color) => {
-    if (selectedObject && selectedObject.set) {
+    if (selectedObject) {
       selectedObject.set({ fill: color });
+      canvas.current.renderAll();
+    }
+  };
+
+  // Change the font of the selected text
+  const changeTextFont = (newFont) => {
+    if (selectedObject && selectedObject.type === 'i-text') {
+      selectedObject.set({ fontFamily: newFont });
+      canvas.current.renderAll();
+    }
+  };
+
+  // Change the color of the selected text
+  const changeTextColor = (newColor) => {
+    if (selectedObject && selectedObject.type === 'i-text') {
+      selectedObject.set({ fill: newColor });
+      canvas.current.renderAll();
+    }
+  };
+
+  // Change the font size of the selected text
+  const changeTextSize = (newSize) => {
+    if (selectedObject && selectedObject.type === 'i-text') {
+      selectedObject.set({ fontSize: newSize });
       canvas.current.renderAll();
     }
   };
 
   return (
     <div className="template-editor-container">
-      {/* Left Sidebar (Navigation) */}
       <div className="sidebar">
         <div className="sidebar-item" onClick={addRectangle}>
           <FaSquare size={20} />
@@ -174,24 +293,35 @@ const TemplateEditor = () => {
             style={{ display: 'none' }}
           />
         </div>
+        <div className="sidebar-item">
+          <label htmlFor="video-upload">
+            <FaVideo size={20} />
+          </label>
+          <input 
+            id="video-upload" 
+            type="file" 
+            onChange={handleVideoUpload} 
+            accept="video/*" 
+            style={{ display: 'none' }}
+          />
+        </div>
         <div className="sidebar-item" onClick={handleSaveTemplate}>
-          <FaSave size={30} />
+          <FaSave size={20} />
         </div>
       </div>
 
       <div className="main-content">
-        {/* Top Bar */}
         <div className="top-bar">
           <button className="back-btn" onClick={handleBackToAdmin}>Back to Admin</button>
           <h2 className="editor-title">Template Editor</h2>
         </div>
 
-        {/* Canvas Element */}
         <canvas ref={canvasRef} style={{ border: '1px solid #000', marginLeft: 'auto', marginRight: 'auto', display: 'block' }}></canvas>
 
-        {/* Show Color and Text Controls Only When an Object is Selected */}
+        {/* Render tools only if an object is selected */}
         {showTools && selectedObject && (
           <div className="tools">
+            {/* If the selected object is text */}
             {selectedObject.type === 'i-text' && (
               <>
                 <select onChange={(e) => changeTextFont(e.target.value)}>
@@ -206,17 +336,33 @@ const TemplateEditor = () => {
                 />
                 <input
                   type="number"
+                  value={selectedObject.fontSize}
                   placeholder="Font Size"
                   onChange={(e) => changeTextSize(Number(e.target.value))}
                 />
               </>
             )}
 
+            {/* If the selected object is not text (i.e., shape or image) */}
             {selectedObject.type !== 'i-text' && (
               <>
-                <button onClick={() => changeShapeColor('red')}>Red</button>
-                <button onClick={() => changeShapeColor('green')}>Green</button>
-                <button onClick={() => changeShapeColor('blue')}>Blue</button>
+                <input
+                  type="number"
+                  value={width}
+                  placeholder="Width"
+                  onChange={(e) => changeWidth(Number(e.target.value))}
+                />
+                <input
+                  type="number"
+                  value={height}
+                  placeholder="Height"
+                  onChange={(e) => changeHeight(Number(e.target.value))}
+                />
+                <input
+                  type="color"
+                  onChange={(e) => changeShapeColor(e.target.value)}
+                  title="Shape Color"
+                />
               </>
             )}
           </div>
