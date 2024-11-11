@@ -1,0 +1,40 @@
+.admin-page {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .admin-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .admin-sections-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .admin-section {
+    background-color: #f4f4f4;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  .admin-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .admin-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  h2 {
+    margin-bottom: 10px;
+  }
+  

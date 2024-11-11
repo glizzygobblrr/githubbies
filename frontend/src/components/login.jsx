@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import '../styles/login.css'; 
 import logo from '../assets/logo.png';
+
 const Login = () => {
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzAxMDU4NzYsImV4cCI6MTczMDEwNjA3Nn0.vSNTKCXwdH_e8EYRqRHwRRnvOpE4UXu6xjEkYDCEZRI"
-    const [email, setEmail] = useState(''); // Changed to email
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -33,18 +34,18 @@ const Login = () => {
             }
 
             console.log('Login successful', data);
-            localStorage.setItem('token', data.token);
+            localStorage.setItem('token', data.token); // Save token
+            localStorage.setItem('role', data.role);   // Save role in localStorage
 
-            const roleType = localStorage.getItem(data.roleType);
-            // check role and redirect based on the account's role
+            // Check role and navigate accordingly
             if (data.role === "Admin") {
-                window.open('/admin', '_blank'); 
+                window.open('/admin', '_blank'); // Open admin dashboard
             } else if (data.role === "Operator") {
-                window.open('/operator', '_blank'); 
+                window.open('/operator', '_blank'); // Open operator dashboard
             } else if (data.role === "Content Creator") {
-                window.location.href = '/content-creator';
+                window.location.href = '/content-creator'; // Open content creator page
             } else if (data.role === "Analyst") {
-                window.location.href = '/analyst';
+                window.location.href = '/analyst'; // Open analyst page
             } else {
                 console.error('Invalid role');
                 setError('Invalid role');
@@ -67,10 +68,10 @@ const Login = () => {
                 <h2>Login</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="email">Email</label> {/* Updated label to email */}
+                        <label htmlFor="email">Email</label>
                         <input
-                            type="email" // Change input type to email for validation
-                            id="email" // Updated id to email
+                            type="email"
+                            id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
