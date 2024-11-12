@@ -3,15 +3,16 @@ import { Canvas, Rect, Circle, IText, FabricImage } from 'fabric';
 import { useNavigate } from 'react-router-dom';
 import './templateEditor.css';
 import { FaImage, FaVideo, FaSquare, FaCircle, FaFont, FaSave } from 'react-icons/fa';
-
+//import Settings from './toolsSettings';
 const TemplateEditor = () => {
   const canvasRef = useRef(null);
   const canvas = useRef(null);
   const navigate = useNavigate();
   const [selectedObject, setSelectedObject] = useState(null); 
   const [showTools, setShowTools] = useState(false); 
-  const [width, setWidth] = useState(0); 
-  const [height, setHeight] = useState(0); 
+  const [width, setWidth] = useState(""); 
+  const [height, setHeight] = useState(""); 
+  //const [color, setColor] = useState("");
 
   // Initialize Fabric.js Canvas
   useEffect(() => {
@@ -24,11 +25,8 @@ const TemplateEditor = () => {
         setSelectedObject(e.target); 
         setShowTools(true); 
 
-        // Set initial width and height for the selected object
-        if (e.target) {
-          setWidth(e.target.width || 0);
-          setHeight(e.target.height || 0);
-        }
+        console.log('Selected Object:', selectedObject);
+
       });
 
       canvas.current.on('selection:cleared', () => {
@@ -42,7 +40,7 @@ const TemplateEditor = () => {
         canvas.current.dispose();
       }
     };
-  }, []);
+  }, [selectedObject]);
 
   // Add a Rectangle
   const addRectangle = () => {
@@ -70,6 +68,7 @@ const TemplateEditor = () => {
       lockScalingFlip: true,
     });
     canvas.current.add(circle);
+    console.log('Circle added')
   };
 
   // Add Editable Text
@@ -208,12 +207,75 @@ const TemplateEditor = () => {
     }
   };
   
-  // save template functionality
-  const handleSaveTemplate = () => {
-    const templateData = canvas.current.toJSON();
-    console.log('Template Data:', templateData); 
+  const handleSaveTemplateAsImage = () => {
+    const jsonData = JSON.stringify(canvasJSON);
+
+    const dataURL = canvas.current.toDataURL({
+      format: 'jpeg',
+      quality: 1,
+    });
+
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'canvas_template.jpg'
+    link.click();
+  }
+
+  const handleSaveTemplateAsVideo = () => {
+    const canvasElement = canvas.current.getElement();
+    const stream = canvasElement.captureStream(30);
+
+    const mediaRecorder = new MediaRecorder(stream);
+    const chunks = [];
+
+    mediaRecorder.ondataavailable = (event) => {
+      if(event.data.size >0 ){
+        chunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      const videoBlob = new Blob(chunks, { type: 'video/mp4'});
+      const videoURL = URL.createObjectURL(videoBlob);
+
+      const link = document.createElement('a');
+      link.href = videoURL;
+      link.download = 'canvas_template_video.mp4';
+      link.click();
+    };
+
+    mediaRecorder.start();
+
+    setTimeout(() => {
+      mediaRecorder.stop();
+    },5000);
   };
 
+  // save template functionality
+  const handleSaveTemplate = () => {
+    //handleSaveTemplateAsJSON();
+    const videoObjects = canvas.current.getObjects().filter(obj => obj.type === 'image' && obj.getElement().tagName ==='VIDEO');
+
+    if (videoObjects.length > 0){
+      handleSaveTemplateAsVideo();
+    } else{
+      handleSaveTemplateAsImage();
+    }
+  };
+
+  // const handleSaveTemplateAsJSON = () => {
+  //   const canvasJSON = canvas.current.toJSON();
+  
+  //   const jsonData = JSON.stringify(canvasJSON);
+  
+  //   const blob = new Blob([jsonData], { type: 'application/json' });
+  
+  //   const link = document.createElement('a');
+  //   link.href = URL.createObjectURL(blob);
+  //   link.download = 'canvas_template.json';
+  //   link.click();
+  // };
+  
   // back to Admin button
   const handleBackToAdmin = () => {
     navigate('/admin');
@@ -343,7 +405,6 @@ const TemplateEditor = () => {
               </>
             )}
 
-            {/* If the selected object is not text (i.e., shape or image) */}
             {selectedObject.type !== 'i-text' && (
               <>
                 <input
