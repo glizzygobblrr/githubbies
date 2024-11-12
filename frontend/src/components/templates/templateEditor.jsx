@@ -12,7 +12,7 @@ const TemplateEditor = () => {
   const [showTools, setShowTools] = useState(false); 
   const [width, setWidth] = useState(""); 
   const [height, setHeight] = useState(""); 
-  //const [color, setColor] = useState("");
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
 
   // Initialize Fabric.js Canvas
   useEffect(() => {
@@ -208,7 +208,9 @@ const TemplateEditor = () => {
   };
   
   const handleSaveTemplateAsImage = () => {
-    const jsonData = JSON.stringify(canvasJSON);
+
+    const templateData = canvas.current.toJSON(['backgroundColor']);
+    console.log('Template Data:', templateData);
 
     const dataURL = canvas.current.toDataURL({
       format: 'jpeg',
@@ -222,6 +224,8 @@ const TemplateEditor = () => {
   }
 
   const handleSaveTemplateAsVideo = () => {
+    const templateData = canvas.current.toJSON(['backgroundColor']);
+    console.log('Template Data:', templateData);
     const canvasElement = canvas.current.getElement();
     const stream = canvasElement.captureStream(30);
 
@@ -281,6 +285,21 @@ const TemplateEditor = () => {
     navigate('/admin');
   };
 
+  // Handle background color change
+const handleBackgroundColorChange = (e) => {
+  const color = e.target.value;
+  setBackgroundColor(color);
+  setCanvasBackgroundColor(color); 
+};
+
+// Set canvas background color
+const setCanvasBackgroundColor = (color) => {
+  if (canvas.current) {
+    canvas.current.set({ backgroundColor: color });
+    canvas.current.renderAll(); // Re-render canvas to apply background color
+  }
+};
+
   // Change Width
   const changeWidth = (newWidth) => {
     if (selectedObject) {
@@ -334,6 +353,13 @@ const TemplateEditor = () => {
   return (
     <div className="template-editor-container">
       <div className="sidebar">
+        <label htmlFor="bg-color">Background Color:</label>
+        <input
+          type="color"
+          id="bg-color"
+          value={backgroundColor}
+          onChange={handleBackgroundColorChange}
+        />
         <div className="sidebar-item" onClick={addRectangle}>
           <FaSquare size={20} />
         </div>
@@ -432,5 +458,6 @@ const TemplateEditor = () => {
     </div>
   );
 };
+
 
 export default TemplateEditor;

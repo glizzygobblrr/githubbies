@@ -77,3 +77,7 @@ canvas {
 .tools {
   margin-top: 20px;
 }
+
+#bg-color{
+  z-index: 1000;
+}
